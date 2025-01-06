@@ -25,11 +25,6 @@ public class AppController {
 		return "login.html";
 	}
 	
-	@GetMapping( "/home")
-	public String loadHome() {
-		return "redirect:https://www.youtube.com";
-	}
-
 	@GetMapping("/register")
 	public String loadRegister(ModelMap map, User user) {
 		return service.loadRegister(map, user);
@@ -55,9 +50,17 @@ public class AppController {
 	public String resendOtp(@PathVariable int id, HttpSession session) {
 		return service.resendOtp(id, session);
 	}
-
-//	@PostMapping("/login")
-//	public String validLogin(@RequestParam String username,HttpSession session) {
-//		return service.validLogin(username,session);
-//	}
+	
+	@PostMapping("/login")
+	public String login(@RequestParam String username, @RequestParam String password, HttpSession session) {
+		return service.login(username, password, session);
+	}
+	@GetMapping("/home")
+	public String loadHome(HttpSession session) {
+		return service.loadHome(session);
+	}
+	@GetMapping("/logout")
+	public String logout(HttpSession session) {
+		return service.logout(session);
+	}
 }
