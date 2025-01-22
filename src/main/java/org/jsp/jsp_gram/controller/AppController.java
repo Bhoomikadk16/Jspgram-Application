@@ -103,4 +103,12 @@ public class AppController {
 	public String follow(@PathVariable int id,HttpSession session) {
 		return service.followUser(id,session);
 	}
+	@GetMapping("/edit/{id}")
+	public String edit(@PathVariable int id, HttpSession session, ModelMap map) {
+		return service.editPost(id, session, map);
+	}
+	@PostMapping("/update-post")
+	public String updatePost(Post post, HttpSession session) throws Exception {
+		return service.updatePost(post, session);
+	}
 }
