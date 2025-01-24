@@ -234,11 +234,12 @@ public class UserService {
 	public String followUser(int id, HttpSession session) {
 		User user = (User) session.getAttribute("user");
 		if (user != null) {
-			User folllowedUser = repository.findById(id).get();
-			user.getFollowing().add(folllowedUser);
-			folllowedUser.getFollowers().add(user);
+			User followedUser = repository.findById(id).get();
+			user.getFollowing().add(followedUser);
+			followedUser.getFollowers().add(user);
 			repository.save(user);
-			repository.save(folllowedUser);
+			repository.save(followedUser);
+			session.setAttribute("user", repository.findById(user.getId()).get());
 			return "redirect:/profile";
 		} else {
 			session.setAttribute("fail", "Invalid Session");
@@ -272,4 +273,66 @@ public class UserService {
 			return "redirect:/login";
 		}
 	}
+	
+	public String getFollowers(HttpSession session, ModelMap map) {
+		User user = (User) session.getAttribute("user");
+		if (user != null) {
+			List<User> followers = user.getFollowers();
+			if (followers.isEmpty()) {
+				session.setAttribute("fail", "No Followers");
+				return "redirect:/profile";
+			} else {
+				map.put("followers", followers);
+				return "followers.html";
+			}
+		} else {
+			session.setAttribute("fail", "Invalid Session");
+			return "redirect:/login";
+		}
+	}
+	public String getFollowing(HttpSession session, ModelMap map) {
+		User user = (User) session.getAttribute("user");
+		if (user != null) {
+			List<User> following = user.getFollowing();
+			if (following.isEmpty()) {
+				session.setAttribute("fail", "Not Following Anyone");
+				return "redirect:/profile";
+			} else {
+				map.put("following", following);
+				return "following.html";
+			}
+		} else {
+			session.setAttribute("fail", "Invalid Session");
+			return "redirect:/login";
+		}
+	}
+	public String unfollow(HttpSession session, int id) {
+		User user = (User) session.getAttribute("user");
+		if (user != null) {
+			User user2 = null;
+			for (User user3 : user.getFollowing()) {
+				if (id == user3.getId()) {
+					user2 = user3;
+					break;
+				}
+			}
+			user.getFollowing().remove(user2);
+			repository.save(user);
+			User user3 = null;
+			for (User user4 : user2.getFollowers()) {
+				if (user.getId() == user4.getId()) {
+					user3 = user4;
+					break;
+				}
+			}
+			user2.getFollowers().remove(user3);
+			repository.save(user2);
+			session.setAttribute("user", repository.findById(user.getId()).get());
+			return "redirect:/profile";
+		} else {
+			session.setAttribute("fail", "Invalid Session");
+			return "redirect:/login";
+		}
+	}
+
 }
